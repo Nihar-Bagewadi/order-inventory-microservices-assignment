@@ -14,7 +14,7 @@ public interface ProductBatchRepository extends JpaRepository<ProductBatch, Long
 
     @Query("""
             select b
-            from InventoryBatch b
+            from ProductBatch b
             where b.product.id = :productId
             and b.quantity > 0
             and b.expiryDate >= :today
