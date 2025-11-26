@@ -1,10 +1,10 @@
-package com.nihar.inventory_service.dto;
-
+package com.nihar.order_service.dto;
 
 import lombok.Data;
 
 @Data
-public class InventoryUpdateRequest {
+public class OrderRequestDto {
+
     private Long productId;
     private int quantity;
 }
