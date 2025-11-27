@@ -1,5 +1,15 @@
 # order-inventory-microservices-assignment
 
+## Note
+
+I have made few assumptions in the assignment for simplicity.
+
+- **Each Order constitutes of only one Product** : In practical scenarios we can have multiple products in a single order, In such case we have have another entity of Product and Quantity mapped to the Order as List of ProductBatches.
+
+- **Dispatch the batches which expires first** : Based on the factory pattern I have created a InventoryAllocator which follows `FEFO` (First Expiry First Out). The batch which expires first would be updated.
+
+- **Dispatching batch even if expired** : In practical scenarios we don't dispatch expired products but for sake of simplicity I am assuming this is okay, if not there is another query which will query the available batches in sorted expiry date which can be used.
+
 ## Project Setup
 
 This project is structured as two independent Spring Boot microservices:
@@ -7,6 +17,26 @@ This project is structured as two independent Spring Boot microservices:
 1. order_service
 
 2. inventory_service
+
+### Technologies Used
+
+- Java 17
+
+- Spring Boot 3.x
+
+- Spring Data JPA
+
+- H2 Database (for tests)
+
+- Lombok
+
+- RestTemplate-based Integration Tests
+
+- JUnit 5 & SpringBootTest
+
+- ControllerAdvice-based Exception Handling
+
+- Factory Design Pattern in Inventory Service for future Extensibility
 
 Each service can run standalone and exposes its own REST API. Both services follow the same structure:
 
