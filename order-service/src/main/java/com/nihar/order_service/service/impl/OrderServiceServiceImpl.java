@@ -71,6 +71,7 @@ public class OrderServiceServiceImpl implements OrderServiceService {
         if(orderInfoPredicate.isPresent()) {
             Order orderInfo = orderInfoPredicate.get();
             return OrderResponseDto.builder()
+                    .id(orderInfo.getId())
                     .orderNumber(orderInfo.getOrderNumber())
                     .productId(orderInfo.getProductId())
                     .quantity(orderInfo.getQuantity())
@@ -87,6 +88,7 @@ public class OrderServiceServiceImpl implements OrderServiceService {
 
         return ordersList.stream().
                 map(order -> OrderResponseDto.builder()
+                .id(order.getId())
                .orderNumber(order.getOrderNumber())
                .productId(order.getProductId())
                .quantity(order.getQuantity())
