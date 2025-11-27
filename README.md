@@ -38,8 +38,6 @@ This project is structured as two independent Spring Boot microservices:
 
 - Factory Design Pattern in Inventory Service for future Extensibility
 
--
-
 Each service can run standalone and exposes its own REST API. Both services follow the same structure:
 
 ### Inventory Service
