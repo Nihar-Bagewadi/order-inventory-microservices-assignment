@@ -6,10 +6,11 @@ import com.nihar.order_service.model.Order;
 import com.nihar.order_service.repository.OrderRepository;
 import com.nihar.order_service.service.OrderServiceService;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderServiceServiceImpl implements OrderServiceService {
 
     private final RestTemplate restTemplate;
@@ -29,24 +31,37 @@ public class OrderServiceServiceImpl implements OrderServiceService {
     @Override
     public OrderResponseDto createOrder(OrderRequestDto requestDto) {
 
-        String url = inventoryBaseUrl.concat("/update");
+        try {
+            String url = inventoryBaseUrl.concat("/update");
 
-        ResponseEntity<String> inventoryResponse = restTemplate.postForEntity(url, requestDto, String.class);
+            log.debug("Fetching the product from Inventory for Product Id : {}", requestDto.getProductId());
+            ResponseEntity<String> inventoryResponse = restTemplate.postForEntity(url, requestDto, String.class);
 
-        if(inventoryResponse.getStatusCode().is2xxSuccessful()) {
-            Order order = Order.builder()
-                    .orderNumber(UUID.randomUUID().toString())
-                    .productId(requestDto.getProductId())
-                    .quantity(requestDto.getQuantity())
-                    .build();
-            Order savedOrder = orderRepository.save(order);
-            return OrderResponseDto.builder()
-                    .orderNumber(savedOrder.getOrderNumber())
-                    .quantity(savedOrder.getQuantity())
-                    .productId(savedOrder.getProductId())
-                    .build();
+            if(inventoryResponse.getStatusCode().is2xxSuccessful()) {
+                log.debug("Creating the Order Entry");
+                Order order = Order.builder()
+                        .orderNumber(UUID.randomUUID().toString())
+                        .productId(requestDto.getProductId())
+                        .quantity(requestDto.getQuantity())
+                        .build();
+
+                log.debug("Saving to the Database");
+                Order savedOrder = orderRepository.save(order);
+
+                log.debug("Returning the created order from the database as response");
+                return OrderResponseDto.builder()
+                        .id(savedOrder.getId())
+                        .orderNumber(savedOrder.getOrderNumber())
+                        .quantity(savedOrder.getQuantity())
+                        .productId(savedOrder.getProductId())
+                        .build();
+            }
+        } catch (HttpClientErrorException e) {
+            log.error("Exception occurred : {}", e.getMessage());
+            throw new RuntimeException(e);
         }
 
+        log.warn("Failed to create the Order");
         return OrderResponseDto.builder().build();
     }
 
